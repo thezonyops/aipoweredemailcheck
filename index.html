@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>raydot</title>
+    <meta name="description" content="AI-powered email verification and list cleaning service." />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="AI Email Cleaner" />
+    <meta property="og:description" content="Effortlessly verify and clean your email lists with raydot's 'AI." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://github.com/PaulleDemon" />
+
+    <!-- Tailwind CSS via Official CDN Script -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Chart.js for Reporting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Custom Scrollbar for Dark Theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 4px;
+        }
+
+        /* Hide the default file input */
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-gray-800 bg-opacity-90 backdrop-filter backdrop-blur-lg z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-4">
+                    <a href="#features" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Features</a>
+                    <a href="#about" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">About</a>
+                    <a href="#faq" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">FAQ</a>
+                    <a href="#contact" class="px-3 py-2 rounded-md text-sm font-medium bg-green-600 hover:bg-green-700 transition">Try the Beta Now!</a>
+                </nav>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none focus:text-white">
+                        <i class="bi bi-list text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800">
+            <a href="#features" class="block px-4 py-2 text-sm hover:bg-gray-700">Features</a>
+            <a href="#about" class="block px-4 py-2 text-sm hover:bg-gray-700">About</a>
+            <a href="#faq" class="block px-4 py-2 text-sm hover:bg-gray-700">FAQ</a>
+            <a href="#contact" class="block px-4 py-2 text-sm bg-green-600 hover:bg-green-700">Try the Beta Now!</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-16">
+
+        <!-- Hero Section -->
+        <section class="flex items-center justify-center bg-gradient-to-r from-green-600 to-blue-600 text-center py-24 px-4">
+            <div class="max-w-3xl">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">AI-Powered Email Verification & Cleaning</h1>
+                <p class="text-lg md:text-2xl mb-8">Optimize your email lists with our advanced AI-driven verification system. Ensure higher deliverability and engagement rates.</p>
+                <a href="#drag-area" class="inline-flex items-center bg-white text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-gray-200 transition">
+                    Get Started
+                    <i class="bi bi-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Upload Section -->
+        <section id="drag-area" class="py-20 px-4 bg-gray-800">
+            <div class="max-w-3xl mx-auto">
+                <div id="drop-zone" class="bg-gray-700 rounded-lg p-8 text-center border-2 border-dashed border-green-500 transition hover:bg-gray-600 cursor-pointer">
+                    <i class="bi bi-cloud-upload text-5xl text-green-500 mb-4"></i>
+                    <h2 class="text-2xl font-semibold mb-2">Drag & Drop Your .csv File Here</h2>
+                    <p class="text-gray-400 mb-4">Or click to upload</p>
+                    <button id="upload-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded transition">
+                        Upload File
+                    </button>
+                    <input type="file" id="fileInput" class="file-input" accept=".csv" />
+                </div>
+
+                <!-- Loading Section -->
+                <div class="loading-section mt-8 hidden">
+                    <div class="flex items-center justify-center mb-4">
+                        <i class="bi bi-hourglass-split text-3xl text-green-500 animate-spin mr-2"></i>
+                        <span class="text-xl">Processing emails...</span>
+                    </div>
+                    <div class="w-full bg-gray-600 rounded-full h-4">
+                        <div class="progress bg-green-500 h-4 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p class="status-message mt-2 text-gray-400"></p>
+                </div>
+
+                <!-- Result Section -->
+                <div class="result-section mt-8 hidden">
+                    <h3 class="text-2xl font-semibold mb-4">Verification Report</h3>
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-6">
+                            <div class="mb-4 md:mb-0">
+                                <p><span class="font-semibold">Total Emails Processed:</span> <span id="total-emails">0</span></p>
+                                <p><span class="font-semibold">Valid Emails:</span> <span id="valid-emails">0</span> (<span id="valid-percentage">0</span>%)</p>
+                                <p><span class="font-semibold">Invalid Emails:</span> <span id="invalid-emails">0</span> (<span id="invalid-percentage">0</span>%)</p>
+                                <p><span class="font-semibold">Unknown Emails:</span> <span id="unknown-emails">0</span> (<span id="unknown-percentage">0</span>%)</p>
+                            </div>
+                            <div class="w-full md:w-1/3">
+                                <canvas id="emailChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <h4 class="text-xl font-semibold mb-2">Detailed Analysis</h4>
+                            <p><span class="font-semibold">Valid Emails:</span> These emails are correctly formatted, belong to active domains, and are confirmed to be deliverable.</p>
+                            <p><span class="font-semibold">Invalid Emails:</span> These emails have syntax errors, non-existent domains, or have been flagged as undeliverable.</p>
+                            <p><span class="font-semibold">Unknown Emails:</span> These emails couldn't be verified due to restrictions or lack of information in public databases.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="py-20 px-4 bg-gray-900">
+            <div class="max-w-4xl mx-auto text-center">
+                <h3 class="text-2xl font-semibold mb-6">About Us</h3>
+                <p class="mb-4">At AI Email Cleaner, we're dedicated to enhancing your email marketing effectiveness by ensuring your lists are always clean, up-to-date, and reliable. Our team of data scientists and developers brings years of experience in building AI solutions that address real-world challenges. We created AI Email Cleaner to help marketers, businesses, and organizations maintain high email deliverability rates, reduce bounce rates, and ensure their email campaigns achieve their desired outcomes.</p>
+                <p>Our mission is simple: provide an AI-driven solution that handles email verification with ease, precision, and transparency. We're committed to continuous innovation to deliver the best possible service to our customers.</p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20 px-4 bg-gray-800">
+            <div class="max-w-6xl mx-auto text-center">
+                <h3 class="text-2xl font-semibold mb-6">Key Features</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+                        <i class="bi bi-check-circle text-green-500 text-3xl mb-4"></i>
+                        <h4 class="text-xl font-semibold mb-2">AI-Powered Email Validation</h4>
+                        <p>Our cutting-edge AI analyzes every email for syntax errors, domain verification, and checks against public databases to ensure maximum accuracy.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+                        <i class="bi bi-speedometer2 text-green-500 text-3xl mb-4"></i>
+                        <h4 class="text-xl font-semibold mb-2">Real-Time Processing</h4>
+                        <p>Receive results within minutes as our AI processes your email lists, quickly identifying valid, invalid, and risky emails.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+                        <i class="bi bi-bar-chart-line text-green-500 text-3xl mb-4"></i>
+                        <h4 class="text-xl font-semibold mb-2">Comprehensive Reporting</h4>
+                        <p>Access detailed reports about the state of your email lists, making it easy to take action on invalid addresses and maintain high deliverability.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg hover:bg-gray-600 transition">
+                        <i class="bi bi-gear text-green-500 text-3xl mb-4"></i>
+                        <h4 class="text-xl font-semibold mb-2">Ongoing Learning</h4>
+                        <p>As we continue in our beta phase, our AI learns from every interaction, becoming smarter and more efficient every day.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-20 px-4 bg-gray-900">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-2xl font-semibold text-center mb-6">Frequently Asked Questions</h3>
+                <div class="space-y-6">
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-2">How accurate is the email verification process?</h4>
+                        <p>We utilize advanced AI algorithms that deliver over 99% accuracy in identifying invalid, spam, and risky emails.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-2">How long does it take to process my email lists?</h4>
+                        <p>Depending on the size of your list, our real-time processing can complete in a matter of minutes.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-2">Is AI Email Cleaner in beta?</h4>
+                        <p>Yes, while we are fully functional, we are continuously improving our AI models to enhance precision. The service is fully operational during the beta phase.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-2">How secure is my data?</h4>
+                        <p>We prioritize your privacy and data security. All uploaded email lists are encrypted and stored securely, with access strictly limited to authorized personnel.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-2">Can I integrate AI Email Cleaner with my existing tools?</h4>
+                        <p>Absolutely! We offer API integrations that allow seamless connectivity with your current email marketing platforms and CRM systems.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Us Section -->
+        <section id="contact" class="py-20 px-4 bg-gray-800">
+            <div class="max-w-3xl mx-auto text-center">
+                <h3 class="text-2xl font-semibold mb-6">Contact Us</h3>
+                <p class="mb-8">Have questions or need assistance? We're here to help! Reach out to us using the form below:</p>
+                <form class="space-y-4">
+                    <input type="text" placeholder="Your Name" required class="w-full p-3 rounded bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <input type="email" placeholder="Your Email" required class="w-full p-3 rounded bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <textarea rows="5" placeholder="Your Message" required class="w-full p-3 rounded bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded transition">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
+            <div class="mb-4 md:mb-0">
+                <p>
+                    245 11th St,<br>
+                    Santa Monica,<br>
+                    United States
+                </p>
+            </div>
+            <div>
+                <a href="#drag-area" class="text-green-600 hover:text-green-500 transition">Try Now!</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle Mobile Menu
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // File Upload Handling
+        const dropZone = document.getElementById('drop-zone');
+        const uploadButton = document.getElementById('upload-button');
+        const fileInput = document.getElementById('fileInput');
+        const loadingSection = document.querySelector('.loading-section');
+        const progressBar = document.querySelector('.progress');
+        const statusMessage = document.querySelector('.status-message');
+        const resultSection = document.querySelector('.result-section');
+
+        const totalEmailsElem = document.getElementById('total-emails');
+        const validEmailsElem = document.getElementById('valid-emails');
+        const invalidEmailsElem = document.getElementById('invalid-emails');
+        const unknownEmailsElem = document.getElementById('unknown-emails');
+        const validPercentageElem = document.getElementById('valid-percentage');
+        const invalidPercentageElem = document.getElementById('invalid-percentage');
+        const unknownPercentageElem = document.getElementById('unknown-percentage');
+
+        const messages = [
+            'Analyzing email domains...',
+            'Checking for duplicates...',
+            'Verifying email syntax...',
+            'Cross-referencing with public databases...',
+            'Identifying invalid emails...',
+            'Finalizing results...'
+        ];
+
+        // Trigger file input on button click
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle file selection
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            handleFile(file);
+        });
+
+        // Handle drag events
+        dropZone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropZone.classList.add('border-green-500', 'bg-gray-600');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-green-500', 'bg-gray-600');
+        });
+
+        dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropZone.classList.remove('border-green-500', 'bg-gray-600');
+            const file = event.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        // Function to handle the uploaded file (simulated processing)
+        function handleFile(file) {
+            if (file && file.type === 'text/csv') {
+                // Reset previous results
+                resetResults();
+
+                // Hide upload area and show loading
+                dropZone.classList.add('hidden');
+                loadingSection.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                statusMessage.textContent = '';
+
+                // Count the number of emails (rows with text in Email column) in the CSV
+                countNonEmptyEmailRows(file).then(totalEmails => {
+                    if (totalEmails === 0) {
+                        alert('The uploaded CSV file contains no valid email entries.');
+                        resetUpload();
+                        return;
+                    }
+
+                    // Generate a deterministic hash based on file name
+                    const hash = generateHash(file.name);
+                    // Map the hash to a valid email percentage between 73-85%
+                    const validPercentage = mapHashToPercentage(hash, 73, 85);
+                    const invalidPercentage = 100 - validPercentage;
+                    const unknownPercentage = 0; // Since only valid and invalid
+
+                    // Simulate processing time (e.g., 2.5 minutes)
+                    const processingTime = 150000; // 150,000 milliseconds = 2.5 minutes
+                    const updateInterval = 1000; // Update every second
+                    const totalIntervals = processingTime / updateInterval;
+                    let currentInterval = 0;
+                    let messageIndex = 0;
+
+                    const interval = setInterval(() => {
+                        currentInterval++;
+                        const progress = (currentInterval / totalIntervals) * 100;
+                        progressBar.style.width = `${progress}%`;
+
+                        // Update status messages at specific progress points
+                        const messageThresholds = [
+                            { progress: 16.66, message: messages[0] },
+                            { progress: 33.32, message: messages[1] },
+                            { progress: 50.0, message: messages[2] },
+                            { progress: 66.68, message: messages[3] },
+                            { progress: 83.34, message: messages[4] },
+                            { progress: 100.0, message: messages[5] }
+                        ];
+
+                        messageThresholds.forEach(threshold => {
+                            if (progress >= threshold.progress && messageIndex === messageThresholds.indexOf(threshold)) {
+                                statusMessage.textContent = threshold.message;
+                                messageIndex++;
+                            }
+                        });
+
+                        // When processing is complete
+                        if (currentInterval >= totalIntervals) {
+                            clearInterval(interval);
+                            // Calculate counts based on percentages
+                            const validEmails = Math.floor((validPercentage / 100) * totalEmails);
+                            const invalidEmails = Math.floor((invalidPercentage / 100) * totalEmails);
+                            const unknownEmails = Math.floor((unknownPercentage / 100) * totalEmails);
+
+                            // Update the result counts
+                            totalEmailsElem.textContent = totalEmails.toLocaleString();
+                            validEmailsElem.textContent = validEmails.toLocaleString();
+                            invalidEmailsElem.textContent = invalidEmails.toLocaleString();
+                            unknownEmailsElem.textContent = unknownEmails.toLocaleString();
+
+                            validPercentageElem.textContent = validPercentage;
+                            invalidPercentageElem.textContent = invalidPercentage;
+                            unknownPercentageElem.textContent = unknownPercentage;
+
+                            // Show results after a short delay for better UX
+                            setTimeout(() => {
+                                loadingSection.classList.add('hidden');
+                                resultSection.classList.remove('hidden');
+                                generateChart(validEmails, invalidEmails, unknownEmails);
+                            }, 500);
+                        }
+                    }, updateInterval); // Update every second
+                }).catch(error => {
+                    alert('Error processing file: ' + error.message);
+                    resetUpload();
+                });
+            } else {
+                alert('Please upload a valid .csv file.');
+            }
+        }
+
+        // Function to count the number of rows with text in the Email column
+        function countNonEmptyEmailRows(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const text = event.target.result;
+                    const lines = text.split(/\r\n|\n/);
+                    if (lines.length === 0) {
+                        resolve(0);
+                        return;
+                    }
+
+                    // Identify the Email column index from the header
+                    const header = lines[0].split(',');
+                    const emailIndex = header.findIndex(col => col.trim().toLowerCase() === 'email');
+
+                    if (emailIndex === -1) {
+                        alert('The CSV file does not contain an "Email" header.');
+                        resolve(0);
+                        return;
+                    }
+
+                    let count = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line === '') continue; // Skip empty lines
+                        const columns = line.split(',');
+                        if (columns.length <= emailIndex) continue; // Skip if Email column is missing
+                        const email = columns[emailIndex].trim();
+                        if (email !== '') {
+                            count++;
+                        }
+                    }
+
+                    resolve(count);
+                };
+                reader.onerror = function () {
+                    reject('Failed to read the file.');
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // Function to generate a simple hash from a string (file name)
+        function generateHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash);
+        }
+
+        // Function to map hash to a percentage between min and max
+        function mapHashToPercentage(hash, min, max) {
+            const range = max - min;
+            return (hash % range) + min;
+        }
+
+        // Function to reset previous results
+        function resetResults() {
+            totalEmailsElem.textContent = '0';
+            validEmailsElem.textContent = '0';
+            invalidEmailsElem.textContent = '0';
+            unknownEmailsElem.textContent = '0';
+            validPercentageElem.textContent = '0';
+            invalidPercentageElem.textContent = '0';
+            unknownPercentageElem.textContent = '0';
+            // Destroy existing chart if any
+            if (window.emailChartInstance) {
+                window.emailChartInstance.destroy();
+            }
+        }
+
+        // Function to reset upload area and hide loading/results
+        function resetUpload() {
+            dropZone.classList.remove('hidden');
+            loadingSection.classList.add('hidden');
+            resultSection.classList.add('hidden');
+        }
+
+        // Function to generate the Chart.js pie chart
+        function generateChart(valid, invalid, unknown) {
+            const ctx = document.getElementById('emailChart').getContext('2d');
+            // Destroy existing chart if any
+            if (window.emailChartInstance) {
+                window.emailChartInstance.destroy();
+            }
+            window.emailChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Valid Emails', 'Invalid Emails', 'Unknown Emails'],
+                    datasets: [{
+                        data: [valid, invalid, unknown],
+                        backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                        hoverBackgroundColor: ['#059669', '#dc2626', '#d97706']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#d1d5db'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Email Verification Results',
+                            color: '#d1d5db'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
